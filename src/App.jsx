@@ -24,7 +24,7 @@ function App() {
       <Form onadditems={handleadditems} />
       <PackingList items={items} ondeleteitems={handleDeleteitems}
         onToggleitem={handleToggleitems}/>
-      <Stats />
+      <Stats  items={items}/>
     </div>
   );
 }
@@ -71,10 +71,24 @@ const Form = () => {
 };
 
 const PackingList = ({ items, ondeleteitems, onToggleitem }) => {
+  const [sortBy, setSortBy] = useState("input");
+
+  let sorteditems;
+
+  if (sortBy === "input") sorteditems = items;
+  if (sortBy === "description")
+    sorteditems = items
+      .slice()
+      .sort((a, b) => a.description.localeCompare(b.description));
+
+  if (sortBy === "packed")
+    sorteditems = items
+      .slice()
+      .sort((a, b) => Number(a.packed) - Number(b.packed));
   return (
     <div className="list">
       <ul>
-        {items.map((item) => (
+        {sorteditems.map((item) => (
           <Item
             item={item}
             ondeleteitems={ondeleteitems}
@@ -83,6 +97,13 @@ const PackingList = ({ items, ondeleteitems, onToggleitem }) => {
           />
         ))}
       </ul>
+       <div className="action">
+        <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+          <option value="input">sot by input order</option>
+          <option value="description">sot by description</option>
+          <option value="packed">sot by packed status</option>
+        </select>
+      </div>
     </div>
   );
 };
@@ -104,10 +125,26 @@ const Item = ({ item, ondeleteitems, onToggleitem }) => {
   );
 };
 
-const Stats = () => {
+const Stats = ({ items }) => {
+  if (!items.length) {
+    return (
+      <p className="stats">
+        <em> put something here for trip ... 🚀 </em>
+      </p>
+    );
+  }
+  const numitems = items.length;
+  const numpacked = items.filter((item) => item.packed).length;
+  const perecentage = Math.round((numpacked / numitems) * 100);
+
   return (
     <footer className="stats">
-      <em>you have x items in your list and you alredy packed x(x%)</em>
+      <em>
+        {perecentage === 100
+          ? "you are ready to go to trip"
+          : `you have ${numitems} items in your list and you alredy packed ${numpacked}
+        (${perecentage}%)`}
+      </em>
     </footer>
   );
 };
