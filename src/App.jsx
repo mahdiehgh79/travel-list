@@ -1,5 +1,9 @@
 import { useState } from "react";
 import Form from "./form";
+import PackingList from "./PackingList";
+import Item from "./item";
+import Stats from "./stats";
+import Logo from "./logo";
 
 function App() {
   const [items, setItems] = useState([]);
@@ -34,91 +38,4 @@ function App() {
   );
 }
 
-
-
-const Logo = () => {
-  return <h1>🌴 Far Away 💰 </h1>;
-};
-
-
-
-const PackingList = ({ items, ondeleteitems, onToggleitem, onClearList }) => {
-  const [sortBy, setSortBy] = useState("input");
-
-  let sorteditems;
-
-  if (sortBy === "input") sorteditems = items;
-  if (sortBy === "description")
-    sorteditems = items
-      .slice()
-      .sort((a, b) => a.description.localeCompare(b.description));
-
-  if (sortBy === "packed")
-    sorteditems = items
-      .slice()
-      .sort((a, b) => Number(a.packed) - Number(b.packed));
-  return (
-    <div className="list">
-      <ul>
-        {sorteditems.map((item) => (
-          <Item
-            item={item}
-            ondeleteitems={ondeleteitems}
-            onToggleitem={onToggleitem}
-            key={item.id}
-          />
-        ))}
-      </ul>
-       <div className="action">
-        <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
-          <option value="input">sot by input order</option>
-          <option value="description">sot by description</option>
-          <option value="packed">sot by packed status</option>
-        </select>
-        <button onClick={onClearList}>clear list </button>
-      </div>
-    </div>
-  );
-};
-
-const Item = ({ item, ondeleteitems, onToggleitem }) => {
-  return (
-    <li>
-      <input
-        type="checkbox"
-        value={item.checked}
-        onChange={() => onToggleitem(item.id)}
-      />
-      <span style={item.packed ? { textDecoration: "line-through" } : {}}>
-        {item.quantity}
-        {item.description}
-      </span>
-      <button onClick={() => ondeleteitems(item.id)}>❌</button>
-    </li>
-  );
-};
-
-const Stats = ({ items }) => {
-  if (!items.length) {
-    return (
-      <p className="stats">
-        <em> put something here for trip ... 🚀 </em>
-      </p>
-    );
-  }
-  const numitems = items.length;
-  const numpacked = items.filter((item) => item.packed).length;
-  const perecentage = Math.round((numpacked / numitems) * 100);
-
-  return (
-    <footer className="stats">
-      <em>
-        {perecentage === 100
-          ? "you are ready to go to trip"
-          : `you have ${numitems} items in your list and you alredy packed ${numpacked}
-        (${perecentage}%)`}
-      </em>
-    </footer>
-  );
-};
 export default App;
